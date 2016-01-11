@@ -1,10 +1,9 @@
 # Unirest for Java [![Build Status][travis-image]][travis-url]
 
-[![License][license-image]][license-url]
-[![version][maven-version]][maven-url]
-[![Gitter][gitter-image]][gitter-url]
+![][unirest-logo]
 
-Unirest is a set of lightweight HTTP libraries available in [multiple languages](http://unirest.io), built and maintained by the [Mashape team](https://github.com/Mashape).
+
+[Unirest](http://unirest.io) is a set of lightweight HTTP libraries available in multiple languages, built and maintained by [Mashape](https://github.com/Mashape), who also maintain the open-source API Gateway [Kong](https://github.com/Mashape/kong). 
 
 Do yourself a favor, and start making HTTP requests like this:
 
@@ -14,6 +13,11 @@ Unirest.post("http://httpbin.org/post")
   .field("last", "Polo")
   .asJson()
 ```
+
+[![License][license-image]][license-url]  |
+[![version][maven-version]][maven-url]  |
+[![Gitter][gitter-image]][gitter-url]
+
 
 ## Features
 
@@ -40,7 +44,7 @@ You can use Maven by including the library:
 <dependency>
     <groupId>com.mashape.unirest</groupId>
     <artifactId>unirest-java</artifactId>
-    <version>1.4.6</version>
+    <version>1.4.7</version>
 </dependency>
 ```
 
@@ -88,7 +92,7 @@ If you would like to run tests, also add the following dependency along with the
 
 ### Without Maven
 
-Alternatively if you don't use Maven, you can directly include the JAR file in the classpath: http://oss.sonatype.org/content/repositories/releases/com/mashape/unirest/unirest-java/1.4.6/unirest-java-1.4.6.jar
+Alternatively if you don't use Maven, you can directly include the JAR file in the classpath: http://oss.sonatype.org/content/repositories/releases/com/mashape/unirest/unirest-java/1.4.7/unirest-java-1.4.7.jar
 
 Don't forget to also install the dependencies ([`org.json`](http://www.json.org/java/), [`httpclient 4.3.6`](http://hc.apache.org/downloads.cgi), [`httpmime 4.3.6`](http://hc.apache.org/downloads.cgi), [`httpasyncclient 4.0.2`](http://hc.apache.org/downloads.cgi)) in the classpath too.
 
@@ -123,15 +127,23 @@ For example, serializing Json from\to Object using the popular Jackson ObjectMap
 ```java
 // Only one time
 Unirest.setObjectMapper(new ObjectMapper() {
-    private com.fasterxml.jackson.databind.ObjectMapper objectMapper 
-        = new com.fasterxml.jackson.databind.ObjectMapper();
-
-    public Object readValue(String value) {
-        return objectMapper.readValue(value);
-    }
+    private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
+                = new com.fasterxml.jackson.databind.ObjectMapper();
     
+    public <T> T readValue(String value, Class<T> valueType) {
+        try {
+            return jacksonObjectMapper.readValue(value, valueType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public String writeValue(Object value) {
-        return objectMapper.writeValueAsString(value);
+        try {
+            return jacksonObjectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 });
 
@@ -333,6 +345,9 @@ Unirest.shutdown();
 ----
 
 Made with &#9829; from the [Mashape](https://www.mashape.com/) team
+
+[unirest-logo]: http://cl.ly/image/2P373Y090s2O/Image%202015-10-12%20at%209.48.06%20PM.png
+
 
 [license-url]: https://github.com/Mashape/unirest-java/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat
